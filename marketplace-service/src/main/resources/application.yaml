@@ -1,0 +1,68 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: marketplace-api
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/gobots}
+    username: ${SPRING_DATASOURCE_USERNAME:gobots}
+    password: ${SPRING_DATASOURCE_PASSWORD:gobots}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    default-schema: ${SPRING_FLYWAY_DEFAULT_SCHEMA:marketplace}
+    schemas: ${SPRING_FLYWAY_SCHEMAS:marketplace}
+    create-schemas: true
+    locations: classpath:db/migration
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+app:
+  messaging:
+    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.orders}
+    routing-keys:
+      created: order.created
+      paid: order.paid
+      shipped: order.shipped
+      completed: order.completed
+      canceled: order.canceled
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

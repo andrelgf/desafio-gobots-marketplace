@@ -1,0 +1,110 @@
+name: gobots-marketplace
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: gobots
+      POSTGRES_USER: gobots
+      POSTGRES_PASSWORD: gobots
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gobots -d gobots"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: 
+      - gobots-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: 
+      - gobots-net
+
+  marketplace-service:
+    build:
+      context: ../marketplace-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gobots
+      SPRING_DATASOURCE_USERNAME: gobots
+      SPRING_DATASOURCE_PASSWORD: gobots
+      SPRING_FLYWAY_DEFAULT_SCHEMA: marketplace
+      SPRING_FLYWAY_SCHEMAS: marketplace
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      APP_MESSAGING_EXCHANGE: marketplace.orders
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: 
+      - gobots-net
+
+  receiver-service:
+    build:
+      context: ../receiver-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gobots
+      SPRING_DATASOURCE_USERNAME: gobots
+      SPRING_DATASOURCE_PASSWORD: gobots
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_DEFAULT_SCHEMA: receiver
+      SPRING_FLYWAY_SCHEMAS: receiver
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      MARKETPLACE_BASE_URL: http://marketplace-service:8080
+      APP_MESSAGING_EXCHANGE: marketplace.orders
+      APP_MESSAGING_QUEUE: receiver.orders.events
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      marketplace-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: 
+      - gobots-net
+
+networks:
+  gobots-net:
+    driver: bridge
+
+volumes:
+  pgdata:
+  rabbitmq_data:
