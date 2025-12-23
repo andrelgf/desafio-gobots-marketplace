@@ -26,7 +26,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             .joinToString("; ") { err: FieldError ->
                 "${err.field}: ${err.defaultMessage}"
             }
-            .ifBlank { "Dados inválidos" }
+            .ifBlank { "Invalid data" }
 
         val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
@@ -38,7 +38,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest
     ): ResponseEntity<Any> {
-        val message = "Requisição inválida: JSON malformado ou campos incompatíveis"
+        val message = "Invalid request: malformed JSON or incompatible fields"
         val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
     }

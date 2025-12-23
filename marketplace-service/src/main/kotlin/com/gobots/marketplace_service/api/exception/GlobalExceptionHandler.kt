@@ -1,5 +1,7 @@
 package com.gobots.marketplace_service.api.exception
 
+import com.gobots.marketplace_service.application.exception.OrderNotFoundException
+import com.gobots.marketplace_service.application.exception.StateTransitionNotAllowed
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -7,11 +9,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-
-import com.gobots.marketplace_service.api.exception.ExceptionResponse
 import java.time.Instant
 
 @RestControllerAdvice
@@ -28,7 +29,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             .joinToString("; ") { err: FieldError ->
                 "${err.field}: ${err.defaultMessage}"
             }
-            .ifBlank { "Dados inválidos" }
+            .ifBlank { "Invalid data" }
 
         val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
@@ -40,7 +41,37 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest
     ): ResponseEntity<Any> {
-        val message = "Requisição inválida: JSON malformado ou campos incompatíveis"
+        val message = "Invalid request: malformed JSON or incompatible fields"
+        val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
+    }
+
+    @ExceptionHandler(OrderNotFoundException::class)
+    fun handleOrderNotFound(
+        ex: OrderNotFoundException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.message ?: "Order not found"
+        val body = buildExceptionResponse(HttpStatus.NOT_FOUND, message, request)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body)
+    }
+
+    @ExceptionHandler(StateTransitionNotAllowed::class)
+    fun handleStateTransitionNotAllowed(
+        ex: StateTransitionNotAllowed,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.message ?: "Order status transition not allowed"
+        val body = buildExceptionResponse(HttpStatus.CONFLICT, message, request)
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body)
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgument(
+        ex: IllegalArgumentException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.message ?: "Invalid request"
         val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
     }
