@@ -1,5 +1,6 @@
 package com.gobots.receiver_service.api.exception
 
+import com.gobots.receiver_service.application.exception.InvalidSubscriptionRequestException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
@@ -39,6 +41,16 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any> {
         val message = "Invalid request: malformed JSON or incompatible fields"
+        val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
+    }
+
+    @ExceptionHandler(InvalidSubscriptionRequestException::class)
+    fun handleInvalidSubscriptionRequest(
+        ex: InvalidSubscriptionRequestException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.message ?: "Invalid subscription request"
         val body = buildExceptionResponse(HttpStatus.BAD_REQUEST, message, request)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
     }
