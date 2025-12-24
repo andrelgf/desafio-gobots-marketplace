@@ -52,14 +52,21 @@ app:
     base-url: ${MARKETPLACE_BASE_URL:http://localhost:8080}
 
   messaging:
-    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.orders}
-    queue: ${APP_MESSAGING_QUEUE:receiver.orders.events}
+    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.order.events}
+    queue: ${APP_MESSAGING_QUEUE:receiver.orders}
+    dead-letter-exchange: ${APP_MESSAGING_DLX:receiver.order.events.dlx}
+    dead-letter-queue: ${APP_MESSAGING_DLQ:receiver.order.dlq}
+    dead-letter-routing-key: ${APP_MESSAGING_DLRK:receiver.order.events.dlq}
+    dead-letter-max-retries: ${APP_MESSAGING_DLQ_MAX_RETRIES:3}
+    dead-letter-retry-header: ${APP_MESSAGING_DLQ_RETRY_HEADER:x-retry-count}
     routing-keys:
+      all: ${APP_MESSAGING_BINDING_ALL:order.*}
       created: order.created
       paid: order.paid
       shipped: order.shipped
       completed: order.completed
       canceled: order.canceled
+
 
 springdoc:
   api-docs:
@@ -68,3 +75,18 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      marketplaceService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  retry:
+    instances:
+      marketplaceService:
+        maxAttempts: 3
+        waitDuration: 500ms

@@ -25,6 +25,8 @@ val springdocVersion = "2.7.0"
 val testcontainersVersion = "1.20.3"
 val mockkVersion = "1.13.13"
 val restAssuredVersion = "5.5.0"
+val springMockkVersion = "4.0.2"
+val awaitilityVersion = "4.2.2"
 
 dependencies {
 
@@ -49,7 +51,10 @@ dependencies {
 	testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))
 	testImplementation("org.testcontainers:postgresql")
 	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:rabbitmq")
 	testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
+	testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
+	testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 	testImplementation("io.mockk:mockk:$mockkVersion")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")

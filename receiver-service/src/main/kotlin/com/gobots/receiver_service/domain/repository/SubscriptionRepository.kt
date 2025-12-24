@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface SubscriptionRepository: JpaRepository<Subscription, Long> {
     fun findAllByStoreCodeIn(storeCodes: Collection<String>): List<Subscription>
+    fun existsByStoreCode(storeCode: String): Boolean
 }

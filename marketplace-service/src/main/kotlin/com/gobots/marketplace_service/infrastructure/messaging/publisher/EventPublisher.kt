@@ -11,24 +11,30 @@ import org.springframework.stereotype.Component
 
 @Component
 class EventPublisher(
-    private val ordersMessagingProperties: OrdersMessagingProperties,
-    private  val rabbitTemplate: RabbitTemplate,
+    private val props: OrdersMessagingProperties,
+    private val rabbitTemplate: RabbitTemplate,
     private val objectMapper: ObjectMapper
 ) {
-    public fun publish(outboxEvent: OutboxEvent) {
-        val routingKey = getRoutingKey(outboxEvent)
-        val payload = objectMapper.readValue<OrderEventPayload>(outboxEvent.payload)
-        rabbitTemplate.convertAndSend(ordersMessagingProperties.exchange, routingKey, payload)
+    fun publish(outboxEvent: OutboxEvent) {
+        val routingKey = routingKey(outboxEvent.eventType)
+
+        val payload = objectMapper.readValue(outboxEvent.payload, OrderEventPayload::class.java)
+
+        rabbitTemplate.convertAndSend(props.exchange, routingKey, outboxEvent.payload) { msg ->
+            val mp = msg.messageProperties
+            mp.contentType = "application/json"
+            mp.setHeader("x-event-id", payload.eventId.toString())
+            mp.setHeader("x-event-type", payload.eventType.name)
+            msg
+        }
     }
 
-    private fun getRoutingKey(outboxEvent: OutboxEvent): String {
-        val routingKey = when (outboxEvent.eventType) {
-            OrderEventType.ORDER_CREATED -> ordersMessagingProperties.routingKeys.created
-            OrderEventType.ORDER_PAID -> ordersMessagingProperties.routingKeys.paid
-            OrderEventType.ORDER_SHIPPED -> ordersMessagingProperties.routingKeys.shipped
-            OrderEventType.ORDER_COMPLETED -> ordersMessagingProperties.routingKeys.completed
-            OrderEventType.ORDER_CANCELED -> ordersMessagingProperties.routingKeys.canceled
+    private fun routingKey(type: OrderEventType): String =
+        when (type) {
+            OrderEventType.ORDER_CREATED -> props.routingKeys.created
+            OrderEventType.ORDER_PAID -> props.routingKeys.paid
+            OrderEventType.ORDER_SHIPPED -> props.routingKeys.shipped
+            OrderEventType.ORDER_COMPLETED -> props.routingKeys.completed
+            OrderEventType.ORDER_CANCELED -> props.routingKeys.canceled
         }
-        return routingKey
-    }
 }

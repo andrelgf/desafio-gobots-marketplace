@@ -86,8 +86,6 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
       MARKETPLACE_BASE_URL: http://marketplace-service:8080
-      APP_MESSAGING_EXCHANGE: marketplace.orders
-      APP_MESSAGING_QUEUE: receiver.orders.events
     ports:
       - "8081:8081"
     depends_on:

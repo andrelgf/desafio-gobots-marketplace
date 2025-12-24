@@ -5,6 +5,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -24,6 +25,13 @@ abstract class AbstractIntegrationTest {
                 withPassword("gobots")
             }
 
+        @Container
+        @JvmField
+        val RABBIT: RabbitMQContainer =
+            RabbitMQContainer("rabbitmq:3-management").apply {
+                withExposedPorts(5672)
+            }
+
         @DynamicPropertySource
         @JvmStatic
         fun props(registry: DynamicPropertyRegistry) {
@@ -34,6 +42,11 @@ abstract class AbstractIntegrationTest {
             registry.add("spring.flyway.schemas") { "receiver" }
             registry.add("spring.flyway.default-schema") { "receiver" }
             registry.add("spring.jpa.properties.hibernate.default_schema") { "receiver" }
+
+            registry.add("spring.rabbitmq.host", RABBIT::getHost)
+            registry.add("spring.rabbitmq.port") { RABBIT.getMappedPort(5672) }
+            registry.add("spring.rabbitmq.username", RABBIT::getAdminUsername)
+            registry.add("spring.rabbitmq.password", RABBIT::getAdminPassword)
         }
     }
 }

@@ -51,7 +51,7 @@ management:
 
 app:
   messaging:
-    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.orders}
+    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.order.events}
     routing-keys:
       created: order.created
       paid: order.paid

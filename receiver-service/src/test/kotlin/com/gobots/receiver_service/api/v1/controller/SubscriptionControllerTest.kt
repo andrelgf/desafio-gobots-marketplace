@@ -1,6 +1,7 @@
 package com.gobots.receiver_service.api.v1.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.gobots.receiver_service.domain.repository.SubscriptionRepository
 import com.gobots.receiver_service.support.AbstractIntegrationTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -18,11 +19,15 @@ class SubscriptionControllerTest : AbstractIntegrationTest() {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
+    @Autowired
+    private lateinit var subscriptionRepository: SubscriptionRepository
+
     @BeforeEach
     fun setup() {
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+        subscriptionRepository.deleteAll()
     }
 
     private fun toJson(value: Any): String = objectMapper.writeValueAsString(value)
