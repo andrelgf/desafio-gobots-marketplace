@@ -5,16 +5,16 @@ import com.gobots.marketplace_service.application.service.OutboxService
 import com.gobots.marketplace_service.domain.model.OrderEventPayload
 import com.gobots.marketplace_service.domain.model.OrderEventType
 import com.gobots.marketplace_service.domain.model.OrderStatus
-import com.gobots.marketplace_service.domain.model.OutboxEvents
+import com.gobots.marketplace_service.domain.model.OutboxEvent
 import com.gobots.marketplace_service.domain.model.OutboxStatus
-import com.gobots.marketplace_service.domain.repository.OutboxEventsRepository
+import com.gobots.marketplace_service.domain.repository.OutboxEventRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.UUID
 
 @Service
 class OutboxServiceImpl(
-    private val outboxEventsRepository: OutboxEventsRepository,
+    private val outboxEventsRepository: OutboxEventRepository,
     private val objectMapper: ObjectMapper,
 ) : OutboxService {
 
@@ -38,7 +38,7 @@ class OutboxServiceImpl(
             occurredAt = occurredAt
         )
 
-        val outbox = OutboxEvents(
+        val outbox = OutboxEvent(
             eventId = eventId,
             eventType = eventType,
             orderId = orderId,

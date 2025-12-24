@@ -14,7 +14,7 @@ import java.util.UUID
         UniqueConstraint(name = "uk_outbox_event_id", columnNames = ["event_id"])
     ]
 )
-class OutboxEvents(
+class OutboxEvent(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

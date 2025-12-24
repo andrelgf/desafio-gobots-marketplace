@@ -58,6 +58,13 @@ app:
       shipped: order.shipped
       completed: order.completed
       canceled: order.canceled
+  outbox:
+    scheduler:
+      enabled: ${APP_OUTBOX_SCHEDULER_ENABLED:true}
+      fixedDelayMs: ${APP_OUTBOX_SCHEDULER_FIXED_DELAY_MS:3000}
+      batchSize: ${APP_OUTBOX_SCHEDULER_BATCH_SIZE:10}
+      maxAttempts: ${APP_OUTBOX_SCHEDULER_MAX_ATTEMPTS:3}
+
 
 springdoc:
   api-docs:
