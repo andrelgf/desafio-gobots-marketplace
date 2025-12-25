@@ -13,6 +13,7 @@ data class MessagingProperties(
     @field:NotBlank
     val queue: String,
     val routingKeys: RoutingKeys,
+    val retry: RetryProperties,
     @field:NotBlank
     val deadLetterExchange: String,
     @field:NotBlank

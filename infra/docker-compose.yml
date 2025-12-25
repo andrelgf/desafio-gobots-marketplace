@@ -44,17 +44,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gobots
       SPRING_DATASOURCE_USERNAME: gobots
       SPRING_DATASOURCE_PASSWORD: gobots
-      SPRING_FLYWAY_DEFAULT_SCHEMA: marketplace
-      SPRING_FLYWAY_SCHEMAS: marketplace
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: "5672"
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      APP_MESSAGING_EXCHANGE: marketplace.orders
-      APP_OUTBOX_SCHEDULER_ENABLED: "true"
-      APP_OUTBOX_SCHEDULER_FIXED_DELAY_MS: "3000"
-      APP_OUTBOX_SCHEDULER_BATCH_SIZE: "10"
-      APP_OUTBOX_SCHEDULER_MAX_ATTEMPTS: "3"
     ports:
       - "8080:8080"
     depends_on:
@@ -78,9 +71,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gobots
       SPRING_DATASOURCE_USERNAME: gobots
       SPRING_DATASOURCE_PASSWORD: gobots
-      SPRING_FLYWAY_ENABLED: "true"
-      SPRING_FLYWAY_DEFAULT_SCHEMA: receiver
-      SPRING_FLYWAY_SCHEMAS: receiver
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: "5672"
       SPRING_RABBITMQ_USERNAME: guest

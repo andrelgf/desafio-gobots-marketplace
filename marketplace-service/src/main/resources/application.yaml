@@ -23,8 +23,8 @@ spring:
 
   flyway:
     enabled: true
-    default-schema: ${SPRING_FLYWAY_DEFAULT_SCHEMA:marketplace}
-    schemas: ${SPRING_FLYWAY_SCHEMAS:marketplace}
+    default-schema: marketplace
+    schemas: marketplace
     create-schemas: true
     locations: classpath:db/migration
 
@@ -51,7 +51,7 @@ management:
 
 app:
   messaging:
-    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.order.events}
+    exchange: marketplace.orders.events
     routing-keys:
       created: order.created
       paid: order.paid
@@ -60,11 +60,10 @@ app:
       canceled: order.canceled
   outbox:
     scheduler:
-      enabled: ${APP_OUTBOX_SCHEDULER_ENABLED:true}
-      fixedDelayMs: ${APP_OUTBOX_SCHEDULER_FIXED_DELAY_MS:3000}
-      batchSize: ${APP_OUTBOX_SCHEDULER_BATCH_SIZE:10}
-      maxAttempts: ${APP_OUTBOX_SCHEDULER_MAX_ATTEMPTS:3}
-
+      enabled: true
+      fixedDelayMs: 3000
+      batchSize: 10
+      maxAttempts: 3
 
 springdoc:
   api-docs:

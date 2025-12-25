@@ -21,8 +21,8 @@ spring:
 
   flyway:
     enabled: true
-    default-schema: ${SPRING_FLYWAY_DEFAULT_SCHEMA:receiver}
-    schemas: ${SPRING_FLYWAY_SCHEMAS:receiver}
+    default-schema: receiver
+    schemas: receiver
     create-schemas: true
     locations: classpath:db/migration
 
@@ -52,21 +52,27 @@ app:
     base-url: ${MARKETPLACE_BASE_URL:http://localhost:8080}
 
   messaging:
-    exchange: ${APP_MESSAGING_EXCHANGE:marketplace.order.events}
-    queue: ${APP_MESSAGING_QUEUE:receiver.orders}
-    dead-letter-exchange: ${APP_MESSAGING_DLX:receiver.order.events.dlx}
-    dead-letter-queue: ${APP_MESSAGING_DLQ:receiver.order.dlq}
-    dead-letter-routing-key: ${APP_MESSAGING_DLRK:receiver.order.events.dlq}
-    dead-letter-max-retries: ${APP_MESSAGING_DLQ_MAX_RETRIES:3}
-    dead-letter-retry-header: ${APP_MESSAGING_DLQ_RETRY_HEADER:x-retry-count}
+    exchange: marketplace.orders.events
+    queue: receiver.orders
+    retry:
+      exchange: receiver.order.events.retry
+      queue1: receiver.order.events.retry.1
+      queue2: receiver.order.events.retry.2
+      delayMs1: 5000
+      delayMs2: 30000
+      routingKey: order.retry
+    dead-letter-exchange: receiver.order.events.dlx
+    dead-letter-queue: receiver.order.dlq
+    dead-letter-routing-key: receiver.order.events.dlq
+    dead-letter-max-retries: 2
+    dead-letter-retry-header: x-retry-count
     routing-keys:
-      all: ${APP_MESSAGING_BINDING_ALL:order.*}
+      all: order.*
       created: order.created
       paid: order.paid
       shipped: order.shipped
       completed: order.completed
       canceled: order.canceled
-
 
 springdoc:
   api-docs:
