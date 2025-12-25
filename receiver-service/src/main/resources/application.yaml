@@ -32,6 +32,14 @@ spring:
     username: ${SPRING_RABBITMQ_USERNAME:guest}
     password: ${SPRING_RABBITMQ_PASSWORD:guest}
 
+feign:
+  client:
+    config:
+      marketplaceClient:
+        connectTimeout: 1000
+        readTimeout: 2000
+        loggerLevel: basic
+
 management:
   endpoints:
     web:
@@ -95,4 +103,7 @@ resilience4j:
     instances:
       marketplaceService:
         maxAttempts: 3
-        waitDuration: 500ms
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        maxWaitDuration: 2s
