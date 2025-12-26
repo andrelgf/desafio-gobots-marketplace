@@ -30,4 +30,19 @@ interface SubscriptionControllerDocs {
         ]
     )
     fun subscribe(@RequestBody request: SubscribeStoreRequest): ResponseEntity<List<SubscriptionDTO>>
+
+    @Operation(summary = "List subscriptions", description = "Returns all subscribed stores")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Subscriptions listed",
+                content = [Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = SubscriptionDTO::class)
+                )]
+            )
+        ]
+    )
+    fun listAll(): ResponseEntity<List<SubscriptionDTO>>
 }

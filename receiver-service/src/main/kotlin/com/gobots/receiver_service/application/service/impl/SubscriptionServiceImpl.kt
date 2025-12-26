@@ -33,4 +33,9 @@ class SubscriptionServiceImpl(private val subscriptionRepository: SubscriptionRe
         val newSubscriptions = toCreate.map { Subscription(it) }
         return subscriptionRepository.saveAll(newSubscriptions)
     }
+
+    @Transactional(readOnly = true)
+    override fun listAll(): List<Subscription> {
+        return subscriptionRepository.findAll()
+    }
 }

@@ -95,4 +95,29 @@ class SubscriptionControllerTest : AbstractIntegrationTest() {
         assertEquals(400, status)
         assertEquals("/api/v1/subscriptions", path)
     }
+
+    @Test
+    fun listAll_returnsSubscriptions() {
+        val body = toJson(mapOf("storeIds" to listOf("store_001", "store_002")))
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(body)
+            .`when`()
+            .post("/api/v1/subscriptions")
+            .then()
+            .statusCode(200)
+
+        val response = RestAssured.given()
+            .accept(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/subscriptions")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response()
+
+        val codes = response.jsonPath().getList<String>("storeCode").sorted()
+        assertEquals(listOf("STORE_001", "STORE_002"), codes)
+    }
 }
