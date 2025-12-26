@@ -20,7 +20,7 @@ class EventPublisher(
 
         val payload = objectMapper.readValue(outboxEvent.payload, OrderEventPayload::class.java)
 
-        rabbitTemplate.convertAndSend(props.exchange, routingKey, outboxEvent.payload) { msg ->
+        rabbitTemplate.convertAndSend(props.exchange, routingKey, payload) { msg ->
             val mp = msg.messageProperties
             mp.contentType = "application/json"
             mp.setHeader("x-event-id", payload.eventId.toString())
