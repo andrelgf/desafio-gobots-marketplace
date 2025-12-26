@@ -1,8 +1,11 @@
 package com.gobots.receiver_service.api.v1.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.gobots.receiver_service.domain.model.OrderEventType
 import com.gobots.receiver_service.domain.model.OrderSnapshot
+import com.gobots.receiver_service.domain.model.ReceivedEvent
 import com.gobots.receiver_service.domain.repository.OrderSnapshotRepository
+import com.gobots.receiver_service.domain.repository.ReceivedEventRepository
 import com.gobots.receiver_service.support.AbstractIntegrationTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -24,24 +27,39 @@ class OrderSnapshotControllerTest : AbstractIntegrationTest() {
     @Autowired
     private lateinit var orderSnapshotRepository: OrderSnapshotRepository
 
+    @Autowired
+    private lateinit var receivedEventRepository: ReceivedEventRepository
+
     @BeforeEach
     fun setup() {
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
         orderSnapshotRepository.deleteAll()
+        receivedEventRepository.deleteAll()
     }
 
     @Test
     fun listAll_returnsOrderSnapshots() {
+        val eventId = UUID.randomUUID()
         val snapshotNode = objectMapper.createObjectNode()
             .put("id", 42L)
             .put("status", "CREATED")
 
+        receivedEventRepository.save(
+            ReceivedEvent(
+                eventId = eventId,
+                eventType = OrderEventType.ORDER_CREATED,
+                orderId = 42L,
+                storeCode = "STORE_042",
+                payload = objectMapper.createObjectNode()
+            )
+        )
+
         val saved = orderSnapshotRepository.save(
             OrderSnapshot(
                 orderId = 42L,
-                eventId = UUID.randomUUID(),
+                eventId = eventId,
                 snapshot = snapshotNode
             )
         )
