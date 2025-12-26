@@ -24,6 +24,11 @@ class ReceivedEventServiceImpl(
 ) : ReceivedEventService {
     private val logger = LoggerFactory.getLogger(ReceivedEventServiceImpl::class.java)
 
+    @Transactional(readOnly = true)
+    override fun listAll(): List<ReceivedEvent> {
+        return receivedEventRepository.findAll()
+    }
+
     @Transactional
     override fun handle(payload: OrderEventPayload) {
         val storeCode = payload.storeCode.trim().uppercase()
