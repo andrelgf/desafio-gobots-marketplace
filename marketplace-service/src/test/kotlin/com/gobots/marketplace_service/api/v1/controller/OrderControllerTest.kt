@@ -2,6 +2,7 @@ package com.gobots.marketplace_service.api.v1.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gobots.marketplace_service.support.AbstractIntegrationTest
+import com.gobots.marketplace_service.domain.repository.OrderRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.BeforeEach
@@ -20,11 +21,15 @@ class OrderControllerTest : AbstractIntegrationTest() {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
+    @Autowired
+    private lateinit var orderRepository: OrderRepository
+
     @BeforeEach
     fun setup() {
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+        orderRepository.deleteAll()
     }
 
     private fun toJson(value: Any): String = objectMapper.writeValueAsString(value)
