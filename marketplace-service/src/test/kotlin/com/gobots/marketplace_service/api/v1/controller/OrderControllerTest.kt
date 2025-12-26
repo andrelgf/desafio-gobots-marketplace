@@ -135,7 +135,7 @@ class OrderControllerTest : AbstractIntegrationTest() {
             .contentType(ContentType.JSON)
             .body(updateBody)
             .`when`()
-            .patch("/api/v1/orders/$id")
+            .patch("/api/v1/orders/$id/status")
             .then()
             .statusCode(200)
             .extract()
@@ -177,7 +177,7 @@ class OrderControllerTest : AbstractIntegrationTest() {
             .contentType(ContentType.JSON)
             .body(updateBody)
             .`when`()
-            .patch("/api/v1/orders/$id")
+            .patch("/api/v1/orders/$id/status")
             .then()
             .statusCode(409)
             .extract()
@@ -186,7 +186,7 @@ class OrderControllerTest : AbstractIntegrationTest() {
         val status = response.jsonPath().getInt("status")
         val path = response.jsonPath().getString("path")
         assertEquals(409, status)
-        assertEquals("/api/v1/orders/$id", path)
+        assertEquals("/api/v1/orders/$id/status", path)
     }
 
     @Test

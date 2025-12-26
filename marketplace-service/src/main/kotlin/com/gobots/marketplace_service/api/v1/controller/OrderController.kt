@@ -51,7 +51,7 @@ class OrderController(
         return ResponseEntity.ok<OrderDTO>(response)
     }
 
-    @PatchMapping(value = ["/{id}"])
+    @PatchMapping(value = ["/{id}/status"])
     override fun updateOrderStatus(@PathVariable id: Long, @Valid @RequestBody newStatusRequest: UpdateOrderStatusRequest): ResponseEntity<OrderDTO>{
         val order = orderService.updateOrderStatusById(id, newStatusRequest.status)
         val  response = orderMapper.toDTO(order)

@@ -78,7 +78,7 @@ Infra / DevOps
 | marketplace-service | POST | /api/v1/orders | Cria uma order |
 | marketplace-service | GET | /api/v1/orders | Lista orders |
 | marketplace-service | GET | /api/v1/orders/{id} | Busca order por id |
-| marketplace-service | PATCH | /api/v1/orders/{id} | Atualiza status da order |
+| marketplace-service | PATCH | /api/v1/orders/{id}/status | Atualiza status da order |
 | receiver-service | POST | /api/v1/subscriptions | Cria subscriptions |
 | receiver-service | GET | /api/v1/subscriptions | Lista subscriptions |
 | receiver-service | GET | /api/v1/received-events | Lista eventos recebidos |
@@ -142,7 +142,7 @@ Status esperado: `CREATED`.
 
 4) Atualizar status (maquina de estados):
 ```bash
-curl -X PATCH http://localhost:8080/api/v1/orders/<id> \
+curl -X PATCH http://localhost:8080/api/v1/orders/<id>/status \
   -H "Content-Type: application/json" \
   -d '{"status":"PAID"}'
 ```
