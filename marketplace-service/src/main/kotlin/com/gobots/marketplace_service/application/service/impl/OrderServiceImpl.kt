@@ -45,6 +45,11 @@ class OrderServiceImpl(
 
         return saved
     }
+
+    @Transactional
+    override fun listAll(): List<Order> {
+        return orderRepository.findAllWithItems()
+    }
     @Transactional
     override fun getById(id: Long): Order {
         return orderRepository.findWithItemsById(id).orElseThrow { OrderNotFoundException(id) }

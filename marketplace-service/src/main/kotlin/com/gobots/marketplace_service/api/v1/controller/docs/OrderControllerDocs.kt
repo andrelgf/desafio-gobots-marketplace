@@ -33,6 +33,21 @@ interface OrderControllerDocs {
     )
     fun createOrder(@RequestBody createOrderRequest: CreateOrderRequest): ResponseEntity<OrderDTO>
 
+    @Operation(summary = "List orders", description = "Returns all orders")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Orders listed",
+                content = [Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = OrderDTO::class)
+                )]
+            )
+        ]
+    )
+    fun listAll(): ResponseEntity<List<OrderDTO>>
+
     @Operation(summary = "Get order by id", description = "Returns a single order by its id")
     @ApiResponses(
         value = [

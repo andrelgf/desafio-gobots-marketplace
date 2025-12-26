@@ -183,4 +183,40 @@ class OrderControllerTest : AbstractIntegrationTest() {
         assertEquals(409, status)
         assertEquals("/api/v1/orders/$id", path)
     }
+
+    @Test
+    fun listAll_returnsOrders() {
+        val body = toJson(
+            mapOf(
+                "storeCode" to "store-1",
+                "items" to listOf(
+                    mapOf(
+                        "productName" to "Widget",
+                        "quantity" to 1,
+                        "unitPrice" to BigDecimal("10.00")
+                    )
+                )
+            )
+        )
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(body)
+            .`when`()
+            .post("/api/v1/orders")
+            .then()
+            .statusCode(201)
+
+        val response = RestAssured.given()
+            .accept(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/orders")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response()
+
+        val size = response.jsonPath().getList<Any>("").size
+        assertEquals(1, size)
+    }
 }

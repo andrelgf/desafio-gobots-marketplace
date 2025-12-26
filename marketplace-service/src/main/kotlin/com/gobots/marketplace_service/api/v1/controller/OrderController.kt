@@ -37,6 +37,13 @@ class OrderController(
         return ResponseEntity.created(location).body(response);
     }
 
+    @GetMapping
+    override fun listAll(): ResponseEntity<List<OrderDTO>> {
+        val orders = orderService.listAll()
+        val response = orders.map(orderMapper::toDTO)
+        return ResponseEntity.ok(response)
+    }
+
     @GetMapping(value = ["/{id}"])
     override fun getById(@PathVariable id: Long): ResponseEntity<OrderDTO> {
         val order = orderService.getById(id)

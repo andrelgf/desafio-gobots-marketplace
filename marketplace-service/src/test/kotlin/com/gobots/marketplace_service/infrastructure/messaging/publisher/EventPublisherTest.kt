@@ -74,10 +74,10 @@ class EventPublisherTest {
         assertEquals(eventId, capturedPayload.eventId)
         verify(exactly = 1) {
             rabbitTemplate.convertAndSend(
-                props.exchange,
-                props.routingKeys.created,
-                any(),
-                any()
+                eq(props.exchange),
+                eq(props.routingKeys.created),
+                any<Any>(),
+                any<org.springframework.amqp.core.MessagePostProcessor>()
             )
         }
     }
