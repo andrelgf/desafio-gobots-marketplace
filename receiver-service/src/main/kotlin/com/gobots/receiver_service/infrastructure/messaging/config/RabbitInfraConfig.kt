@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.amqp.support.converter.MessageConverter
+import org.springframework.amqp.support.converter.SimpleMessageConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -30,12 +31,11 @@ class RabbitInfraConfig {
 
     @Bean
     fun rabbitListenerContainerFactory(
-        connectionFactory: ConnectionFactory,
-        messageConverter: MessageConverter
+        connectionFactory: ConnectionFactory
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
-        factory.setMessageConverter(messageConverter)
+        factory.setMessageConverter(SimpleMessageConverter())
 
         factory.setDefaultRequeueRejected(false)
 

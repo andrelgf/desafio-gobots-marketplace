@@ -8,16 +8,15 @@ import com.gobots.marketplace_service.domain.model.OutboxEvent
 import com.gobots.marketplace_service.domain.model.OutboxStatus
 import com.gobots.marketplace_service.infrastructure.messaging.config.properties.OrdersMessagingProperties
 import com.gobots.marketplace_service.infrastructure.messaging.config.properties.RoutingKeys
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class EventPublisherTest {
     private val rabbitTemplate: RabbitTemplate = mockk(relaxed = true)
@@ -55,30 +54,22 @@ class EventPublisherTest {
             payload = objectMapper.writeValueAsString(payload)
         )
 
-        val messagePostProcessor = slot<org.springframework.amqp.core.MessagePostProcessor>()
-        val bodySlot = slot<Any>()
-
-        every {
-            rabbitTemplate.convertAndSend(
-                props.exchange,
-                props.routingKeys.created,
-                capture(bodySlot),
-                capture(messagePostProcessor)
-            )
-        } returns Unit
+        val messageSlot = slot<Message>()
 
         publisher.publish(outboxEvent)
 
-        assertTrue(bodySlot.captured is OrderEventPayload)
-        val capturedPayload = bodySlot.captured as OrderEventPayload
-        assertEquals(eventId, capturedPayload.eventId)
         verify(exactly = 1) {
-            rabbitTemplate.convertAndSend(
+            rabbitTemplate.send(
                 eq(props.exchange),
                 eq(props.routingKeys.created),
-                any<Any>(),
-                any<org.springframework.amqp.core.MessagePostProcessor>()
+                capture(messageSlot)
             )
         }
+
+        val capturedPayload = objectMapper.readValue(messageSlot.captured.body, OrderEventPayload::class.java)
+        assertEquals(eventId, capturedPayload.eventId)
+        assertEquals("application/json", messageSlot.captured.messageProperties.contentType)
+        assertEquals(eventId.toString(), messageSlot.captured.messageProperties.headers["x-event-id"])
+        assertEquals(OrderEventType.ORDER_CREATED.name, messageSlot.captured.messageProperties.headers["x-event-type"])
     }
 }

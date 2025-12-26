@@ -7,6 +7,7 @@ import com.gobots.marketplace_service.domain.model.OrderEventType
 import com.gobots.marketplace_service.domain.model.OutboxEvent
 import com.gobots.marketplace_service.infrastructure.messaging.config.properties.OrdersMessagingProperties
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.core.MessageBuilder
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,13 +21,13 @@ class EventPublisher(
 
         val payload = objectMapper.readValue(outboxEvent.payload, OrderEventPayload::class.java)
 
-        rabbitTemplate.convertAndSend(props.exchange, routingKey, payload) { msg ->
-            val mp = msg.messageProperties
-            mp.contentType = "application/json"
-            mp.setHeader("x-event-id", payload.eventId.toString())
-            mp.setHeader("x-event-type", payload.eventType.name)
-            msg
-        }
+        val message = MessageBuilder.withBody(objectMapper.writeValueAsBytes(payload))
+            .setContentType("application/json")
+            .setHeader("x-event-id", payload.eventId.toString())
+            .setHeader("x-event-type", payload.eventType.name)
+            .build()
+
+        rabbitTemplate.send(props.exchange, routingKey, message)
     }
 
     private fun routingKey(type: OrderEventType): String =
