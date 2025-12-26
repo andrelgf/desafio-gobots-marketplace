@@ -117,6 +117,8 @@ Servicos:
 - marketplace-service: http://localhost:8080
 - receiver-service: http://localhost:8081
 - RabbitMQ UI: http://localhost:15672 (guest/guest)
+- Swagger UI marketplace: http://localhost:8080/swagger-ui.html
+- Swagger UI receiver: http://localhost:8081/swagger-ui.html
 
 ## Roteiro E2E (fluxo completo)
 1) Criar subscription no receiver:
